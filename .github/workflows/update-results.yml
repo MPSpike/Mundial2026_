@@ -3,7 +3,7 @@ name: Atualizar resultados Mundial 2026
 on:
   schedule:
     # Todos os dias às 08:00 UTC (09:00/10:00 em Portugal, dependendo da hora de verão)
-    - cron: "0 8 * * *"
+    - cron: "15 * * * *"
   workflow_dispatch: {}   # permite correr manualmente no GitHub
 
 permissions:
