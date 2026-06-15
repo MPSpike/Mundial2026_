@@ -91,6 +91,9 @@
   .main-content {
     padding: 1.5vw 2vw;
     margin-top: clamp(32px, 3.5vw, 52px);
+    max-width: 2400px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* ── HEADER ── */
@@ -264,10 +267,11 @@
   }
 
   table.grupo-table th, table.grupo-table td {
-    padding: 0.35vw 0.4vw;
+    padding: clamp(4px, 0.35vw, 8px) clamp(3px, 0.4vw, 8px);
     text-align: center;
     border-bottom: 1px solid #EEEEEE;
-    min-width: 18px;
+    min-width: 20px;
+    font-size: clamp(10px, 0.85vw, 14px);
   }
 
   table.grupo-table th:first-child,
@@ -276,8 +280,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    max-width: 90px;
-    min-width: 60px;
+    max-width: 110px;
+    min-width: 65px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -348,7 +352,7 @@
   </div>
   <div class="scroll-controls">
     <span id="speed-label">Velocidade</span>
-    <input type="range" id="speed-range" min="1" max="10" value="3">
+    <input type="range" id="speed-range" min="1" max="10" value="1">
     <button class="scroll-btn" id="btn-pause" onclick="toggleScroll()">▶ AUTO-SCROLL</button>
     <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ TOPO</button>
   </div>
@@ -783,6 +787,9 @@ function scrollToSection(id) {
 document.querySelectorAll('input[type=number].score-box, input[type=number].score-box-sm').forEach(inp => {
   inp.addEventListener('input', () => inp.classList.toggle('filled', inp.value !== ''));
 });
+
+// ── AUTO-REFRESH every 30 minutes ──
+setTimeout(() => { location.reload(); }, 30 * 60 * 1000);
 </script>
 
 </body>
