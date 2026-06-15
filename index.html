@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundial 2026 – Calendário</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&display=swap');
+
+  :root {
+    --red: #C8102E;
+    --gold: #9A6E00;
+    --dark: #111111;
+    --muted: #666666;
+    --border: #CCCCCC;
+    --bg: #FFFFFF;
+    --day-header: #222222;
+    --match-alt: #F7F7F7;
+    --score-bg: #F0F0F0;
+    --score-border: #999999;
+    --group-bg: #EEEEEE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--dark);
+    font-family: 'Barlow Condensed', sans-serif;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* ── AUTOSCROLL CONTROLS ── */
+  #scroll-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4vw 1.5vw;
+    z-index: 1000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(11px, 1.1vw, 16px);
+    letter-spacing: 1px;
+    gap: 1vw;
+  }
+
+  #scroll-bar .brand { color: var(--red); font-size: clamp(13px, 1.3vw, 20px); letter-spacing: 2px; }
+
+  .scroll-controls { display: flex; align-items: center; gap: 0.8vw; }
+
+  .scroll-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(10px, 1vw, 15px);
+    letter-spacing: 1px;
+    padding: 0.3vw 0.8vw;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .scroll-btn:hover { background: var(--red); border-color: var(--red); }
+  .scroll-btn.active { background: var(--red); border-color: var(--red); }
+
+  #speed-label { color: #aaa; font-size: clamp(9px, 0.85vw, 13px); }
+
+  input[type=range] {
+    width: clamp(60px, 6vw, 100px);
+    accent-color: var(--red);
+  }
+
+  .nav-links { display: flex; gap: 0.8vw; }
+  .nav-link {
+    color: #aaa;
+    text-decoration: none;
+    font-size: clamp(9px, 0.85vw, 13px);
+    letter-spacing: 1px;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-link:hover { color: var(--red); }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    padding: 1.5vw 2vw;
+    margin-top: clamp(32px, 3.5vw, 52px);
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--red);
+    padding-bottom: 1vw;
+    margin-bottom: 1.2vw;
+    flex-wrap: wrap;
+    gap: 1vw;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 72px);
+    letter-spacing: 3px;
+    line-height: 1;
+    color: var(--dark);
+  }
+  h1 span { color: var(--red); }
+
+  .subtitle {
+    font-size: clamp(8px, 1vw, 13px);
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 0.3vw;
+  }
+
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5vw; }
+  .header-right img { height: clamp(30px, 4vw, 60px); }
+  .header-meta { text-align: right; font-size: clamp(7px, 0.85vw, 12px); color: var(--muted); line-height: 1.6; }
+  .header-meta strong { color: var(--dark); }
+
+  /* ── PHASE LABEL ── */
+  .phase-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(10px, 1.1vw, 16px);
+    letter-spacing: 2px;
+    color: var(--red);
+    background: #FFF5F5;
+    border-left: 4px solid var(--red);
+    padding: 0.4vw 0.8vw;
+    margin-bottom: 0.8vw;
+  }
+
+  /* ── CALENDAR GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: 0.6vw;
+  }
+  @media (min-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1600px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 2000px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+
+  .day-block { background: #F9F9F9; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+
+  .day-header { background: var(--day-header); padding: 0.4vw 0.6vw; display: flex; justify-content: space-between; align-items: baseline; }
+  .day-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(11px, 1.1vw, 18px); letter-spacing: 1px; color: #fff; }
+  .day-date { font-size: clamp(8px, 0.85vw, 13px); color: #F5A623; font-weight: 700; }
+
+  .match { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 0.35vw 0.6vw; border-bottom: 1px solid #E8E8E8; gap: 0.5vw; background: #fff; }
+  .match:nth-child(even) { background: var(--match-alt); }
+  .match:last-child { border-bottom: none; }
+
+  .match-time { font-family: 'Bebas Neue', sans-serif; font-size: clamp(10px, 1vw, 15px); color: var(--gold); white-space: nowrap; }
+  .match-teams { font-size: clamp(8px, 0.85vw, 13px); color: var(--dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.3; }
+  .match-teams .vs { color: var(--muted); font-weight: 400; font-size: clamp(7px, 0.75vw, 11px); }
+
+  .match-right { display: flex; align-items: center; gap: 0.4vw; }
+  .score-area { display: flex; align-items: center; gap: 0.3vw; }
+
+  .score-box {
+    width: clamp(22px, 2vw, 34px); height: clamp(20px, 1.8vw, 30px);
+    background: var(--score-bg); border: 1.5px solid var(--score-border); border-radius: 2px;
+    color: var(--dark); font-family: 'Bebas Neue', sans-serif; font-size: clamp(11px, 1.1vw, 17px);
+    text-align: center; outline: none; -webkit-appearance: none; padding: 0;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .score-box:focus { border-color: var(--red); background: #FFF0F0; }
+  .score-box.filled { color: var(--red); background: #FFF8F8; border-color: #AAA; }
+  .score-sep { font-family: 'Bebas Neue', sans-serif; font-size: clamp(10px, 1vw, 15px); color: var(--muted); }
+
+  .match-group { font-size: clamp(6px, 0.65vw, 10px); color: var(--muted); background: var(--group-bg); border: 1px solid #DDD; padding: 0.2vw 0.4vw; border-radius: 2px; white-space: nowrap; text-align: center; }
+
+  .match.portugal { background: #FFF2F3 !important; border-left: 3px solid var(--red); }
+  .match.portugal .match-teams { color: var(--red); }
+
+  /* ── KNOCKOUT ── */
+  .section-gap { margin-top: 1.5vw; }
+
+  .knockout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 0.6vw;
+  }
+  @media (min-width: 1200px) { .knockout-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1600px) { .knockout-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .knockout-block { background: #F9F9F9; border: 1px solid var(--border); border-top: 3px solid var(--red); padding: 0.6vw; }
+  .knockout-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(11px, 1.1vw, 18px); letter-spacing: 1.5px; color: var(--red); margin-bottom: 0.5vw; }
+
+  .knockout-item { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 0.5vw; padding: 0.3vw 0; border-bottom: 1px solid #E0E0E0; font-size: clamp(8px, 0.8vw, 12px); }
+  .knockout-item:last-child { border-bottom: none; }
+  .ki-date { font-family: 'Bebas Neue', sans-serif; font-size: clamp(9px, 0.9vw, 13px); color: var(--gold); white-space: nowrap; }
+  .ki-time { color: var(--muted); font-size: clamp(7px, 0.75vw, 11px); white-space: nowrap; }
+  .ki-match { color: var(--dark); font-weight: 700; text-transform: uppercase; font-size: clamp(8px, 0.8vw, 12px); }
+  .ki-score { display: flex; align-items: center; gap: 0.3vw; }
+
+  .score-box-sm {
+    width: clamp(20px, 1.8vw, 30px); height: clamp(18px, 1.6vw, 28px);
+    background: var(--score-bg); border: 1.5px solid var(--score-border); border-radius: 2px;
+    color: var(--dark); font-family: 'Bebas Neue', sans-serif; font-size: clamp(10px, 1vw, 15px);
+    text-align: center; outline: none; -webkit-appearance: none; padding: 0;
+  }
+  .score-box-sm:focus { border-color: var(--red); background: #FFF0F0; }
+  .score-box-sm.filled { color: var(--red); background: #FFF8F8; }
+
+  /* ── GRUPOS ── */
+  #grupos {
+    margin-top: 2vw;
+    padding-top: 1vw;
+    border-top: 3px solid var(--red);
+  }
+
+  .grupos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 0.7vw;
+    margin-top: 0.8vw;
+  }
+  @media (min-width: 1200px) { .grupos-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1800px) { .grupos-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  .grupo-block {
+    background: #F9F9F9;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .grupo-header {
+    background: var(--red);
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(12px, 1.2vw, 18px);
+    letter-spacing: 2px;
+    padding: 0.4vw 0.7vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .grupo-header span { font-size: clamp(7px, 0.7vw, 10px); color: rgba(255,255,255,0.7); letter-spacing: 0.5px; font-family: 'Barlow Condensed', sans-serif; }
+
+  table.grupo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(10px, 0.85vw, 14px);
+  }
+
+  table.grupo-table thead tr {
+    background: #E8E8E8;
+    color: var(--muted);
+    font-size: clamp(8px, 0.7vw, 11px);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  table.grupo-table th, table.grupo-table td {
+    padding: 0.35vw 0.4vw;
+    text-align: center;
+    border-bottom: 1px solid #EEEEEE;
+    min-width: 18px;
+  }
+
+  table.grupo-table th:first-child,
+  table.grupo-table td:first-child {
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    max-width: 90px;
+    min-width: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  table.grupo-table tbody tr:last-child td { border-bottom: none; }
+
+  table.grupo-table tbody tr:nth-child(1),
+  table.grupo-table tbody tr:nth-child(2) {
+    background: #F0FFF4;
+  }
+  table.grupo-table tbody tr:nth-child(3) {
+    background: #FFFDF0;
+  }
+
+  .pts-cell { font-family: 'Bebas Neue', sans-serif; font-size: clamp(11px, 1vw, 16px); color: var(--red); font-weight: bold; }
+
+  .grp-input {
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 16px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    outline: none;
+    padding: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 1.5vw;
+    padding: 0.8vw 2vw;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: clamp(7px, 0.75vw, 11px);
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 0.5vw;
+    background: #FAFAFA;
+  }
+
+  .legend { display: flex; gap: 1vw; align-items: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.4vw; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .portugal-dot { background: var(--red); }
+  .qualify-dot { background: #22C55E; }
+  .playoff-dot { background: #EAB308; }
+
+  @media print {
+    #scroll-bar { display: none; }
+    .main-content { margin-top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SCROLL BAR ── -->
+<div id="scroll-bar">
+  <div class="brand">MUNDIAL 2026</div>
+  <div class="nav-links">
+    <span class="nav-link" onclick="scrollToSection('calendario')">Calendário</span>
+    <span class="nav-link" onclick="scrollToSection('eliminatoria')">Eliminatória</span>
+    <span class="nav-link" onclick="scrollToSection('grupos')">Grupos</span>
+  </div>
+  <div class="scroll-controls">
+    <span id="speed-label">Velocidade</span>
+    <input type="range" id="speed-range" min="1" max="10" value="3">
+    <button class="scroll-btn" id="btn-pause" onclick="toggleScroll()">▶ AUTO-SCROLL</button>
+    <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ TOPO</button>
+  </div>
+</div>
+
+<div class="main-content">
+
+<!-- ── HEADER ── -->
+<header>
+  <div>
+    <h1>MUNDIAL <span>2026</span></h1>
+    <div class="subtitle">Calendário Completo · Horário de Portugal Continental</div>
+  </div>
+  <div class="header-right">
+    <img src="data:image/png;base64,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" alt="Schréder Hyperion">
+    <div class="header-meta">
+      <strong>11 Junho – 19 Julho 2026</strong><br>
+      Estados Unidos · México · Canadá<br>
+      48 Seleções · 104 Jogos &nbsp;<span style="color:var(--red)">■</span> Jogos de Portugal
+    </div>
+  </div>
+</header>
+
+<!-- ── CALENDÁRIO ── -->
+<div id="calendario">
+  <div class="phase-label">FASE DE GRUPOS · 11 a 28 de Junho</div>
+  <div class="grid">
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Quinta</span><span class="day-date">11 Jun</span></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">México <span class="vs">vs</span> África do Sul</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="2"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="0"></div><span class="match-group">Gr. A</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sexta</span><span class="day-date">12 Jun</span></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Coreia do Sul <span class="vs">vs</span> Rep. Checa</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="2"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. A</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Canadá <span class="vs">vs</span> Bósnia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="1"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. B</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sábado</span><span class="day-date">13 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">EUA <span class="vs">vs</span> Paraguai</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="4"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Catar <span class="vs">vs</span> Suíça</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="1"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. B</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Brasil <span class="vs">vs</span> Marrocos</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="1"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. C</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Domingo</span><span class="day-date">14 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">Haiti <span class="vs">vs</span> Escócia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="0"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. C</span></div></div>
+      <div class="match"><span class="match-time">05:00</span><span class="match-teams">Austrália <span class="vs">vs</span> Turquia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="2"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="0"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">18:00</span><span class="match-teams">Alemanha <span class="vs">vs</span> Curaçao</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Holanda <span class="vs">vs</span> Japão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Segunda</span><span class="day-date">15 Jun</span></div>
+      <div class="match"><span class="match-time">00:00</span><span class="match-teams">Costa Marfim <span class="vs">vs</span> Equador</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Suécia <span class="vs">vs</span> Tunísia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">17:00</span><span class="match-teams">Espanha <span class="vs">vs</span> Cabo Verde</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Bélgica <span class="vs">vs</span> Egito</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Ar. Saudita <span class="vs">vs</span> Uruguai</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Terça</span><span class="day-date">16 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">Irão <span class="vs">vs</span> Nova Zelândia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">França <span class="vs">vs</span> Senegal</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Iraque <span class="vs">vs</span> Noruega</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Quarta</span><span class="day-date">17 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">Argentina <span class="vs">vs</span> Argélia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match"><span class="match-time">05:00</span><span class="match-teams">Áustria <span class="vs">vs</span> Jordânia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match portugal"><span class="match-time">18:00</span><span class="match-teams">🇵🇹 Portugal <span class="vs">vs</span> Congo</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Inglaterra <span class="vs">vs</span> Croácia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Quinta</span><span class="day-date">18 Jun</span></div>
+      <div class="match"><span class="match-time">00:00</span><span class="match-teams">Gana <span class="vs">vs</span> Panamá</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Uzbequistão <span class="vs">vs</span> Colômbia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">17:00</span><span class="match-teams">Rep. Checa <span class="vs">vs</span> África do Sul</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. A</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Suíça <span class="vs">vs</span> Bósnia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. B</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Canadá <span class="vs">vs</span> Catar</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. B</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sexta</span><span class="day-date">19 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">México <span class="vs">vs</span> Coreia do Sul</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. A</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">EUA <span class="vs">vs</span> Austrália</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Escócia <span class="vs">vs</span> Marrocos</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. C</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sábado</span><span class="day-date">20 Jun</span></div>
+      <div class="match"><span class="match-time">01:30</span><span class="match-teams">Brasil <span class="vs">vs</span> Haiti</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. C</span></div></div>
+      <div class="match"><span class="match-time">04:00</span><span class="match-teams">Turquia <span class="vs">vs</span> Paraguai</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">18:00</span><span class="match-teams">Holanda <span class="vs">vs</span> Suécia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Alemanha <span class="vs">vs</span> Costa Marfim</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Domingo</span><span class="day-date">21 Jun</span></div>
+      <div class="match"><span class="match-time">01:00</span><span class="match-teams">Equador <span class="vs">vs</span> Curaçao</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">05:00</span><span class="match-teams">Tunísia <span class="vs">vs</span> Japão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">17:00</span><span class="match-teams">Espanha <span class="vs">vs</span> Ar. Saudita</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Bélgica <span class="vs">vs</span> Irão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Uruguai <span class="vs">vs</span> Cabo Verde</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Segunda</span><span class="day-date">22 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">Nova Zelândia <span class="vs">vs</span> Egito</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">18:00</span><span class="match-teams">Argentina <span class="vs">vs</span> Áustria</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match"><span class="match-time">22:00</span><span class="match-teams">França <span class="vs">vs</span> Iraque</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Terça</span><span class="day-date">23 Jun</span></div>
+      <div class="match"><span class="match-time">01:00</span><span class="match-teams">Noruega <span class="vs">vs</span> Senegal</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+      <div class="match"><span class="match-time">04:00</span><span class="match-teams">Jordânia <span class="vs">vs</span> Argélia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match portugal"><span class="match-time">18:00</span><span class="match-teams">🇵🇹 Portugal <span class="vs">vs</span> Uzbequistão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Inglaterra <span class="vs">vs</span> Gana</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Quarta</span><span class="day-date">24 Jun</span></div>
+      <div class="match"><span class="match-time">00:00</span><span class="match-teams">Panamá <span class="vs">vs</span> Croácia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Colômbia <span class="vs">vs</span> Congo</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Suíça <span class="vs">vs</span> Canadá</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. B</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Bósnia <span class="vs">vs</span> Catar</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. B</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Marrocos <span class="vs">vs</span> Haiti</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. C</span></div></div>
+      <div class="match"><span class="match-time">23:00</span><span class="match-teams">Escócia <span class="vs">vs</span> Brasil</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. C</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Quinta</span><span class="day-date">25 Jun</span></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">África do Sul <span class="vs">vs</span> Coreia Sul</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. A</span></div></div>
+      <div class="match"><span class="match-time">02:00</span><span class="match-teams">Rep. Checa <span class="vs">vs</span> México</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. A</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Curaçao <span class="vs">vs</span> Costa Marfim</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">21:00</span><span class="match-teams">Equador <span class="vs">vs</span> Alemanha</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sexta</span><span class="day-date">26 Jun</span></div>
+      <div class="match"><span class="match-time">00:00</span><span class="match-teams">Tunísia <span class="vs">vs</span> Holanda</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">00:00</span><span class="match-teams">Japão <span class="vs">vs</span> Suécia</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. E</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Turquia <span class="vs">vs</span> EUA</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Paraguai <span class="vs">vs</span> Austrália</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. D</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Noruega <span class="vs">vs</span> França</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+      <div class="match"><span class="match-time">20:00</span><span class="match-teams">Senegal <span class="vs">vs</span> Iraque</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. G</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Sábado</span><span class="day-date">27 Jun</span></div>
+      <div class="match"><span class="match-time">01:00</span><span class="match-teams">Cabo Verde <span class="vs">vs</span> Ar. Saudita</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+      <div class="match"><span class="match-time">01:00</span><span class="match-teams">Uruguai <span class="vs">vs</span> Espanha</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. L</span></div></div>
+      <div class="match"><span class="match-time">04:00</span><span class="match-teams">Nova Zelândia <span class="vs">vs</span> Bélgica</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">04:00</span><span class="match-teams">Egito <span class="vs">vs</span> Irão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. F</span></div></div>
+      <div class="match"><span class="match-time">22:00</span><span class="match-teams">Panamá <span class="vs">vs</span> Inglaterra</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+      <div class="match"><span class="match-time">22:00</span><span class="match-teams">Croácia <span class="vs">vs</span> Gana</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. I</span></div></div>
+    </div>
+
+    <div class="day-block">
+      <div class="day-header"><span class="day-name">Domingo</span><span class="day-date">28 Jun</span></div>
+      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Argélia <span class="vs">vs</span> Áustria</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Jordânia <span class="vs">vs</span> Argentina</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match portugal"><span class="match-time">00:30</span><span class="match-teams">🇵🇹 Colômbia <span class="vs">vs</span> Portugal</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Congo <span class="vs">vs</span> Uzbequistão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── FASE ELIMINATÓRIA ── -->
+<div id="eliminatoria" class="phase-label section-gap">FASE A ELIMINAR · 28 Junho – 19 Julho</div>
+<div class="knockout-grid">
+  <div class="knockout-block">
+    <div class="knockout-title">16 Avos de Final</div>
+    <div class="knockout-item"><span class="ki-date">28 Jun</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 1</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">29 Jun</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 2</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">29 Jun</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 3</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">30 Jun</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 4</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">30 Jun</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 5</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">1 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 6</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">1 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 7</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">2 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 8</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">2 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 9</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">3 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 10</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">3 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 11</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">4 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 12</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+  </div>
+  <div class="knockout-block">
+    <div class="knockout-title">Oitavos de Final</div>
+    <div class="knockout-item"><span class="ki-date">Sáb 4 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 1</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Dom 5 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 2</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Dom 5 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 3</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Seg 6 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 4</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Seg 6 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 5</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Ter 7 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 6</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Ter 7 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 7</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Qua 8 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 8</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+  </div>
+  <div class="knockout-block" style="border-top-color:#9A6E00">
+    <div class="knockout-title" style="color:#9A6E00">Quartos · Meias · Final</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(9px,0.9vw,13px);color:var(--red);letter-spacing:1px;margin:0.5vw 0 0.3vw">Quartos de Final</div>
+    <div class="knockout-item"><span class="ki-date">Qui 9 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 1</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Sex 10 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 2</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Sex 10 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Jogo 3</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Sáb 12 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Jogo 4</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(9px,0.9vw,13px);color:var(--red);letter-spacing:1px;margin:0.8vw 0 0.3vw">Meias-Finais</div>
+    <div class="knockout-item"><span class="ki-date">Ter 14 Jul</span><span class="ki-time">~21h</span><span class="ki-match">Meia-Final 1</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Qua 15 Jul</span><span class="ki-time">~01h</span><span class="ki-match">Meia-Final 2</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item"><span class="ki-date">Sáb 18 Jul</span><span class="ki-time">~21h</span><span class="ki-match">🥉 3.º/4.º · Miami</span><div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99"><span style="color:var(--muted)">–</span><input class="score-box-sm" type="number" min="0" max="99"></div></div>
+    <div class="knockout-item" style="background:#FFFBF0;padding:0.5vw;border:1px solid #DDD;border-radius:2px;margin-top:0.8vw">
+      <span class="ki-date" style="color:#9A6E00;font-size:clamp(10px,1vw,15px)">Dom 19 Jul</span>
+      <span class="ki-time" style="color:#9A6E00">~21h</span>
+      <span class="ki-match" style="color:#9A6E00">🏆 FINAL · MetLife NJ</span>
+      <div class="ki-score"><input class="score-box-sm" type="number" min="0" max="99" style="border-color:#9A6E00"><span style="color:#9A6E00">–</span><input class="score-box-sm" type="number" min="0" max="99" style="border-color:#9A6E00"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── GRUPOS ── -->
+<div id="grupos">
+  <div class="phase-label" style="margin-top:2vw">GRUPOS DO MUNDIAL 2026 · Classificação</div>
+  <div class="grupos-grid" id="grupos-grid"></div>
+</div>
+
+<footer>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot portugal-dot"></div><span>Portugal</span></div>
+    <div class="legend-item"><div class="legend-dot qualify-dot"></div><span>Qualificado (top 2)</span></div>
+    <div class="legend-item"><div class="legend-dot playoff-dot"></div><span>Playoff 3.ºs (top 8)</span></div>
+    <span>·</span><span>J=Jogos V=Vitórias E=Empates D=Derrotas GM=Golos Marcados GS=Golos Sofridos DG=Diferença Pts=Pontos</span>
+  </div>
+  <div>Mundial 2026 · EUA · México · Canadá</div>
+</footer>
+
+</div><!-- /main-content -->
+
+<script>
+// ── GRUPOS DATA ──
+const grupos = {
+  A: ['México','Coreia do Sul','Rep. Checa','África do Sul'],
+  B: ['Canadá','Suíça','Bósnia','Catar'],
+  C: ['Brasil','Marrocos','Escócia','Haiti'],
+  D: ['EUA','Austrália','Turquia','Paraguai'],
+  E: ['Alemanha','Holanda','Japão','Equador','Suécia','Tunísia','Costa Marfim','Curaçao'],
+  F: ['Bélgica','Irão','Nova Zelândia','Egito'],
+  G: ['França','Noruega','Senegal','Iraque'],
+  H: ['Argentina','Áustria','Argélia','Jordânia'],
+  I: ['Inglaterra','Croácia','Gana','Panamá'],
+  J: ['Espanha','Marrocos 2','Brasil 2','Japão 2'],
+  K: ['Portugal','Colômbia','Uzbequistão','Congo'],
+  L: ['Espanha','Uruguai','Ar. Saudita','Cabo Verde']
+};
+
+// Correct group E to only 4 teams (it's actually two separate groups)
+const gruposCorretos = {
+  A: ['México','Coreia do Sul','Rep. Checa','África do Sul'],
+  B: ['Canadá','Suíça','Bósnia','Catar'],
+  C: ['Brasil','Marrocos','Escócia','Haiti'],
+  D: ['EUA','Austrália','Turquia','Paraguai'],
+  E: ['Alemanha','Holanda','Japão','Equador'],
+  F: ['Bélgica','Irão','Nova Zelândia','Egito'],
+  G: ['França','Noruega','Senegal','Iraque'],
+  H: ['Argentina','Áustria','Argélia','Jordânia'],
+  I: ['Inglaterra','Croácia','Gana','Panamá'],
+  J: ['Suécia','Tunísia','Costa Marfim','Curaçao'],
+  K: ['🇵🇹 Portugal','Colômbia','Uzbequistão','Congo'],
+  L: ['Espanha','Uruguai','Ar. Saudita','Cabo Verde']
+};
+
+// Standings data: [J, V, E, D, GM, GS, DG, Pts] - pre-filled from results played so far
+const standingsData = {
+  'México':        [1,1,0,0,2,0,2,3],
+  'Coreia do Sul': [1,1,0,0,2,1,1,3],
+  'Rep. Checa':    [1,0,0,1,1,2,-1,0],
+  'África do Sul': [1,0,0,1,0,2,-2,0],
+  'Canadá':        [1,0,1,0,1,1,0,1],
+  'Bósnia':        [1,0,1,0,1,1,0,1],
+  'Catar':         [1,0,1,0,1,1,0,1],
+  'Suíça':         [1,0,1,0,1,1,0,1],
+  'Brasil':        [1,0,1,0,1,1,0,1],
+  'Marrocos':      [1,0,1,0,1,1,0,1],
+  'Escócia':       [1,1,0,0,1,0,1,3],
+  'Haiti':         [1,0,0,1,0,1,-1,0],
+  'EUA':           [1,1,0,0,4,1,3,3],
+  'Austrália':     [1,1,0,0,2,0,2,3],
+  'Turquia':       [1,0,0,1,0,2,-2,0],
+  'Paraguai':      [1,0,0,1,1,4,-3,0]
+};
+
+function buildGroupTable(groupName, teams) {
+  const block = document.createElement('div');
+  block.className = 'grupo-block';
+
+  // Sort teams by points, then goal difference, then goals scored
+  const sortedTeams = [...teams].sort((a, b) => {
+    const ka = a.replace('🇵🇹 ',''), kb = b.replace('🇵🇹 ','');
+    const da = standingsData[ka] || [0,0,0,0,0,0,0,0];
+    const db = standingsData[kb] || [0,0,0,0,0,0,0,0];
+    if (db[7] !== da[7]) return db[7] - da[7];   // Pts desc
+    if (db[6] !== da[6]) return db[6] - da[6];   // DG desc
+    if (db[4] !== da[4]) return db[4] - da[4];   // GM desc
+    return 0;
+  });
+
+  block.innerHTML = `
+    <div class="grupo-header">GRUPO ${groupName} <span>${teams.length} equipas</span></div>
+    <table class="grupo-table">
+      <thead>
+        <tr><th>Equipa</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GM</th><th>GS</th><th>DG</th><th>Pts</th></tr>
+      </thead>
+      <tbody>
+        ${sortedTeams.map((t,i) => {
+          const key = t.replace('🇵🇹 ','');
+          const d = standingsData[key] || [0,0,0,0,0,0,0,0];
+          return `
+          <tr>
+            <td>${t}</td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[0]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[1]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[2]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[3]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[4]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[5]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input" value="${d[6]}"></td>
+            <td><input type="number" min="0" max="99" class="grp-input pts-cell" value="${d[7]}"></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+
+  // Style inputs + live recalculation
+  const rows = block.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('.grp-input');
+    // indices: 0=J 1=V 2=E 3=D 4=GM 5=GS 6=DG 7=Pts
+    function recalc() {
+      const v = parseInt(inputs[1].value) || 0;
+      const e = parseInt(inputs[2].value) || 0;
+      const d = parseInt(inputs[3].value) || 0;
+      const gm = parseInt(inputs[4].value) || 0;
+      const gs = parseInt(inputs[5].value) || 0;
+      inputs[0].value = v + e + d;
+      inputs[6].value = gm - gs;
+      inputs[7].value = v * 3 + e;
+    }
+    [1,2,3,4,5].forEach(idx => inputs[idx].addEventListener('input', recalc));
+  });
+
+  block.querySelectorAll('.grp-input').forEach(inp => {
+    Object.assign(inp.style, {
+      width:'100%', border:'none', background:'transparent',
+      fontFamily:"'Bebas Neue',sans-serif", fontSize:'inherit',
+      textAlign:'center', outline:'none', color:'inherit', padding:'0'
+    });
+    inp.addEventListener('focus', () => inp.style.background='#FFF0F0');
+    inp.addEventListener('blur', () => inp.style.background='transparent');
+  });
+
+  return block;
+}
+
+const grid = document.getElementById('grupos-grid');
+Object.entries(gruposCorretos).forEach(([name, teams]) => {
+  grid.appendChild(buildGroupTable(name, teams));
+});
+
+// ── AUTOSCROLL ──
+let scrolling = false;
+let scrollInterval = null;
+let scrollDirection = 1; // 1 = down, -1 = up
+const btn = document.getElementById('btn-pause');
+const speedRange = document.getElementById('speed-range');
+
+function getSpeed() { return parseInt(speedRange.value); }
+
+function startScroll() {
+  scrolling = true;
+  btn.textContent = '⏸ PAUSAR';
+  btn.classList.add('active');
+  scrollInterval = setInterval(() => {
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    const current = window.scrollY;
+
+    if (scrollDirection === 1 && current >= maxScroll - 2) {
+      scrollDirection = -1;
+    } else if (scrollDirection === -1 && current <= 2) {
+      scrollDirection = 1;
+    }
+
+    window.scrollBy(0, getSpeed() * scrollDirection);
+  }, 30);
+}
+
+function stopScroll() {
+  scrolling = false;
+  btn.textContent = '▶ AUTO-SCROLL';
+  btn.classList.remove('active');
+  clearInterval(scrollInterval);
+}
+
+function toggleScroll() {
+  if (scrolling) stopScroll(); else startScroll();
+}
+
+// Start automatically when page loads
+startScroll();
+
+// Pause on user interaction
+document.addEventListener('wheel', () => { if (scrolling) stopScroll(); }, { passive: true });
+document.addEventListener('touchstart', () => { if (scrolling) stopScroll(); }, { passive: true });
+
+function scrollToSection(id) {
+  stopScroll();
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// Score inputs highlight
+document.querySelectorAll('input[type=number].score-box, input[type=number].score-box-sm').forEach(inp => {
+  inp.addEventListener('input', () => inp.classList.toggle('filled', inp.value !== ''));
+});
+</script>
+
+</body>
+</html>
