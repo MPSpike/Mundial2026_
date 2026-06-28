@@ -522,10 +522,10 @@
 
     <div class="day-block">
       <div class="day-header"><span class="day-name">Domingo</span><span class="day-date">28 Jun</span></div>
-      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Argélia <span class="vs">vs</span> Áustria</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
-      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Jordânia <span class="vs">vs</span> Argentina</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. H</span></div></div>
-      <div class="match portugal"><span class="match-time">00:30</span><span class="match-teams">🇵🇹 Colômbia <span class="vs">vs</span> Portugal</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
-      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Congo <span class="vs">vs</span> Uzbequistão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Argélia <span class="vs">vs</span> Áustria</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="3"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="3"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match"><span class="match-time">00:30</span><span class="match-teams">Jordânia <span class="vs">vs</span> Argentina</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="1"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="3"></div><span class="match-group">Gr. H</span></div></div>
+      <div class="match portugal"><span class="match-time">00:30</span><span class="match-teams">🇵🇹 Colômbia <span class="vs">vs</span> Portugal</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="0"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="0"></div><span class="match-group">Gr. K</span></div></div>
+      <div class="match"><span class="match-time">03:00</span><span class="match-teams">Congo <span class="vs">vs</span> Uzbequistão</span><div class="match-right"><div class="score-area"><input class="score-box" type="number" min="0" max="99" value="3"><span class="score-sep">–</span><input class="score-box" type="number" min="0" max="99" value="1"></div><span class="match-group">Gr. K</span></div></div>
     </div>
 
   </div>
@@ -635,8 +635,8 @@ const gruposCorretos = {
 const standingsData = {
   'Alemanha':       [3,2,0,1,10,4,6,6],
   'Ar. Saudita':    [3,0,2,1,1,5,-4,2],
-  'Argentina':      [2,2,0,0,5,0,5,6],
-  'Argélia':        [2,1,0,1,2,4,-2,3],
+  'Argentina':      [3,3,0,0,8,1,7,9],
+  'Argélia':        [3,1,1,1,5,7,-2,4],
   'Austrália':      [3,1,1,1,2,2,0,4],
   'Brasil':         [3,2,1,0,7,1,6,7],
   'Bélgica':        [3,1,2,0,6,2,4,5],
@@ -644,8 +644,8 @@ const standingsData = {
   'Cabo Verde':     [3,0,3,0,2,2,0,3],
   'Canadá':         [3,1,1,1,8,3,5,4],
   'Catar':          [3,0,1,2,2,10,-8,1],
-  'Colômbia':       [2,2,0,0,4,1,3,6],
-  'Congo':          [2,0,1,1,1,2,-1,1],
+  'Colômbia':       [3,2,1,0,4,1,3,7],
+  'Congo':          [3,1,1,1,4,3,1,4],
   'Coreia do Sul':  [3,1,0,2,2,3,-1,3],
   'Costa Marfim':   [3,2,0,1,4,2,2,6],
   'Croácia':        [3,2,0,1,5,5,0,6],
@@ -663,14 +663,14 @@ const standingsData = {
   'Iraque':         [3,0,0,3,1,12,-11,0],
   'Irão':           [3,0,3,0,3,3,0,3],
   'Japão':          [3,1,2,0,7,3,4,5],
-  'Jordânia':       [2,0,0,2,2,5,-3,0],
+  'Jordânia':       [3,0,0,3,3,8,-5,0],
   'Marrocos':       [3,2,1,0,6,3,3,7],
   'México':         [3,3,0,0,6,0,6,9],
   'Noruega':        [3,2,0,1,8,7,1,6],
   'Nova Zelândia':  [3,0,1,2,4,10,-6,1],
   'Panamá':         [3,0,0,3,0,4,-4,0],
   'Paraguai':       [3,1,1,1,2,4,-2,4],
-  'Portugal':       [2,1,1,0,6,1,5,4],
+  'Portugal':       [3,1,2,0,6,1,5,5],
   'Rep. Checa':     [3,0,1,2,2,6,-4,1],
   'Senegal':        [3,1,0,2,8,6,2,3],
   'Suécia':         [3,1,1,1,7,7,0,4],
@@ -678,9 +678,9 @@ const standingsData = {
   'Tunísia':        [3,0,0,3,2,12,-10,0],
   'Turquia':        [3,1,0,2,3,5,-2,3],
   'Uruguai':        [3,0,2,1,3,4,-1,2],
-  'Uzbequistão':    [2,0,0,2,1,8,-7,0],
+  'Uzbequistão':    [3,0,0,3,2,11,-9,0],
   'África do Sul':  [3,1,1,1,2,3,-1,4],
-  'Áustria':        [2,1,0,1,3,3,0,3],
+  'Áustria':        [3,1,1,1,6,6,0,4],
 };
 
 function buildGroupTable(groupName, teams) {
